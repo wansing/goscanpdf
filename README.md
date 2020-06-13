@@ -4,11 +4,13 @@ goscanpdf performs a batch scan with scanimage, converts the uncompressed PNM fi
 
 Pages with a dark pixel ratio less than 0.0003 are sorted out. The "dark" threshold for a pixel is 50%.
 
-The resulting PDF file is rsync'ed to `goscanpdf-target:${prefix}scaninput`. There will be no password prompt, you must use key based authentication insted.
+The resulting PDF file is rsync'ed via SSH to `goscanpdf-target:${prefix}scaninput`. There will be no password prompt, you must use key based authentication insted.
 
 ## Installation
 
-Compile goscanpdf, e.g. for Linux on a RaspberryPi:
+Arch Linux users can install goscanpdf from the [AUR](https://aur.archlinux.org/packages/goscanpdf).
+
+Others can compile it themselves, e.g. for Linux on a Raspberry Pi:
 
 ```
 export GOOS=linux
@@ -16,7 +18,9 @@ export GOARCH=arm
 go build path/to/goscanpdf.go
 ```
 
-Adjust your .ssh/config:
+## Setup
+
+goscanpdf uploads scanned documents via SSH. Configure your `goscanpdf-target` in `~/.ssh/config`:
 
 ```
 Host goscanpdf-target
@@ -27,6 +31,18 @@ Host goscanpdf-target
 In order to speed up scanimage, you can remove unused backends from `/etc/sane.d/dll.conf`.
 
 You can use [insaned](https://github.com/abusenius/insaned) to run goscanpdf when a button on the scanner is pressed.
+
+### Configuration
+
+```
+Usage of goscanpdf:
+  -cores number
+    	Maximum number of simultaneous single-core convert workers. You might want to spare one CPU core for scanimage, which typically produces about 50% of goscanpdf's CPU load but can't be parallelized. (default 3)
+  -dpi resolution
+    	scan resolution in dots per inch (default 200)
+  -prefix string
+    	a string which is prepended to the PDF filename
+```
 
 ## System requirements
 
